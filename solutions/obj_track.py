@@ -1,15 +1,14 @@
 import sys
 sys.path.append('..')
 
-
 if __name__ == '__main__':
     import cv2
     import detector
-    import tracker
+    import tracker as Tracker
 
 yolo = detector.DetectorYOLO(r'../../../yolov8n-pose.pt')
 yolo.set_predict_settings(verbose=False)
-tracker = tracker.TrackerNorfair()
+tracker = Tracker.TrackerNorfair()
 
 cap = cv2.VideoCapture(0)
 while cap.isOpened():

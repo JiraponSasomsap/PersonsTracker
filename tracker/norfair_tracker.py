@@ -6,6 +6,7 @@ from reid.osnet import osnet
 
 class TrackerNorfair(BaseTracker):
     def __init__(self, **tracker_cfg):
+        super().__init__()
         self.params = {'distance_function':'euclidean', 
                                'distance_threshold':50}
         self.params.update(tracker_cfg)

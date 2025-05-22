@@ -19,7 +19,7 @@ class BaseDetector(ABC):
     @abstractmethod
     def predict(self, 
                 source: Union[str, Path, int, Image.Image, list, tuple, np.ndarray, torch.Tensor],
-                **kwargs) -> Any:
+                **kwargs) -> 'BaseDetectorResults':
         pass
     
     def __call__(self, img):
