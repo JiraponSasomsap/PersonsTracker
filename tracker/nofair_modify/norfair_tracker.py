@@ -35,10 +35,14 @@ class TrackerNorfair(BaseTracker):
         norfair_detections = [norfair.Detection(points=points.reshape(2,2)) for points in detections]
         self.tracker.update(detections=norfair_detections)
         return TrackerNorfairResults(self)
+    
+    @property
+    def get(self):
+        return TrackerNorfairResults(self)
 
 class TrackerNorfairResults(BaseTrackerResults):
     def __init__(self, instance:'TrackerNorfair'):
-        super().__init__()
+        super().__init__(self)
         self.instance = instance
         self.is_process = False
         self._boxes = None

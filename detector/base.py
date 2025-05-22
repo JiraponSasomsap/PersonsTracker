@@ -19,13 +19,22 @@ class BaseDetector(ABC):
     @abstractmethod
     def predict(self, 
                 source: Union[str, Path, int, Image.Image, list, tuple, np.ndarray, torch.Tensor],
-                **kwargs) -> Any:
+                **kwargs) -> 'BaseDetectorResults':
         pass
     
     def __call__(self, img):
         return self.predict(img)
     
+    @property
+    @abstractmethod
+    def get(self) -> 'BaseDetectorResults':
+        pass
+    
 class BaseDetectorResults(ABC):
+    def __init__(self, instance:'BaseDetector'):
+        super().__init__()
+        self.instance = instance
+
     @abstractmethod
     def boxse(self):
         pass
