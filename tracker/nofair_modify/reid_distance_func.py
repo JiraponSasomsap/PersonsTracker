@@ -2,7 +2,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 import cv2
 
 def embedding_cosine_similarity(matched_not_init_trackers, unmatched_trackers):
-    print('embedding_cosine_similarity')
     snd_embedding = unmatched_trackers.last_detection.embedding
 
     if snd_embedding is None:
@@ -22,7 +21,6 @@ def embedding_cosine_similarity(matched_not_init_trackers, unmatched_trackers):
     return 1
 
 def embedding_distance(matched_not_init_trackers, unmatched_trackers):
-    print('embedding_distance')
     snd_embedding = unmatched_trackers.last_detection.embedding
 
     if snd_embedding is None:

@@ -25,7 +25,16 @@ class BaseDetector(ABC):
     def __call__(self, img):
         return self.predict(img)
     
+    @property
+    @abstractmethod
+    def get(self) -> 'BaseDetectorResults':
+        pass
+    
 class BaseDetectorResults(ABC):
+    def __init__(self, instance:'BaseDetector'):
+        super().__init__()
+        self.instance = instance
+
     @abstractmethod
     def boxse(self):
         pass

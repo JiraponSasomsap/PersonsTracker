@@ -32,6 +32,10 @@ class TrackerNorfairREID(TrackerNorfair):
         ]
         self.tracker.update(detections=norfair_detections)
         return TrackerNorfairResultsREID(self)
+    
+    @property
+    def get(self):
+        return TrackerNorfairResultsREID(self)
 
 class TrackerNorfairResultsREID(TrackerNorfairResults):
     def __init__(self, instance):

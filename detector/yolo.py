@@ -6,6 +6,7 @@ from PIL import Image
 import torch
 
 from .base import BaseDetector, BaseDetectorResults
+import warnings
 
 class DetectorYOLO(BaseDetector):
     def __init__(self, 
@@ -37,18 +38,22 @@ class DetectorYOLO(BaseDetector):
         self.results = self.model.predict(source=source, **_kwargs)[0]
         return GetResults(self)
     
+    @property
+    def get(self):
+        return GetResults(self)
+    
     def __call__(self, img):
         return self.predict(img, **self.kwargs)
         
 class GetResults(BaseDetectorResults):
     def __init__(self, instance:DetectorYOLO):
-        super().__init__()
-        self.instance = instance
+        super().__init__(instance)
     
     def boxse(self):
         results = self.instance.results
         if results is None:
-            raise RuntimeError("No prediction results found. Please run `predict()` first.")
+            warnings.warn("No prediction results found. Please run `predict()` first.", UserWarning)
+            return np.empty((0, 4), dtype=np.float32)
         
         boxes = results.boxes
         if boxes is not None and boxes.xyxy is not None:
