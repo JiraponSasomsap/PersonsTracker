@@ -1,4 +1,10 @@
 import cv2
+from pathlib import Path
+
+def version():
+    v = Path(__file__).parents[1] / "VERSION"
+    print(v)
+    return v.read_text().strip()
 
 def get_hist(image):
     hist = cv2.calcHist(
