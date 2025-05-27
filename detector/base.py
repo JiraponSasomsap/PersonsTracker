@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import torch
 from abc import ABC, abstractmethod
+import cv2
 
 class BaseDetector(ABC):
     def __init__(self):
@@ -11,6 +12,7 @@ class BaseDetector(ABC):
         self.model = None
         self.kwargs:dict = None
         self.results = None
+        self.original_img = None
 
     @abstractmethod
     def set_predict_settings(self, **kwargs) -> None:
@@ -38,3 +40,15 @@ class BaseDetectorResults(ABC):
     @abstractmethod
     def boxse(self):
         pass
+
+    def plot(self, img=None):
+        if img is None:
+            if self.original_img is None:
+                raise ValueError
+            plot = self.original_img.copy()
+        else:
+            plot = img.copy()
+        for box in self.boxse():
+            x1, y1, x2, y2 = map(int, box[:4])
+            cv2.rectangle(plot, (x1, y1), (x2, y2), (0, 0, 255), 5)
+        return plot

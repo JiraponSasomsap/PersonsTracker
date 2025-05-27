@@ -16,6 +16,7 @@ class TrackerNorfair(BaseTracker):
                  reid_distance_function = None,
                  reid_distance_threshold: float = 0,
                  reid_hit_counter_max: int | None = None):
+        super().__init__()
         self.params = {
             'distance_function':distance_function,
             'distance_threshold':distance_threshold,

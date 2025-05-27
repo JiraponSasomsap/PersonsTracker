@@ -7,6 +7,8 @@ import torch
 
 from .base import BaseDetector, BaseDetectorResults
 import warnings
+import torch
+from torchvision.ops import nms
 
 class DetectorYOLO(BaseDetector):
     def __init__(self, 
@@ -29,38 +31,53 @@ class DetectorYOLO(BaseDetector):
 
     def set_predict_settings(self, **kwargs):
         self.kwargs.update(kwargs)
+        return self
 
     def predict(self,
                 source: Union[str, Path, int, Image.Image, list, tuple, np.ndarray, torch.Tensor],
                 **kwargs):
         _kwargs = self.kwargs.copy()
         _kwargs.update(kwargs)
+        self.original_img = source.copy()
         self.results = self.model.predict(source=source, **_kwargs)[0]
-        return GetResults(self)
+        return GetDetectorYOLO(self)
     
     @property
     def get(self):
-        return GetResults(self)
+        return GetDetectorYOLO(self)
     
     def __call__(self, img):
         return self.predict(img, **self.kwargs)
         
-class GetResults(BaseDetectorResults):
+class GetDetectorYOLO(BaseDetectorResults):
     def __init__(self, instance:DetectorYOLO):
         super().__init__(instance)
-    
+
     def boxse(self):
         results = self.instance.results
         if results is None:
             warnings.warn("No prediction results found. Please run `predict()` first.", UserWarning)
             return np.empty((0, 4), dtype=np.float32)
-        
+
         boxes = results.boxes
         if boxes is not None and boxes.xyxy is not None:
-            return boxes.xyxy.cpu().numpy()
+            # Get boxes and scores
+            box_tensor = boxes.xyxy.cpu()  # shape: (N, 4)
+            scores = boxes.conf.cpu() if hasattr(boxes, 'conf') else torch.ones(len(box_tensor))  # fallback to 1.0
+
+            if len(box_tensor) == 0:
+                return np.empty((0, 4), dtype=np.float32)
+
+            # Apply NMS (IoU threshold = 0.5)
+            keep_indices = nms(box_tensor, scores, iou_threshold=0.5)
+
+            # Filter and return kept boxes
+            filtered_boxes = box_tensor[keep_indices].numpy()
+            return filtered_boxes
+
         else:
             return np.empty((0, 4), dtype=np.float32)
-        
+
     def imcrops(self):
         results = self.instance.results
         img = results.orig_img
