@@ -38,7 +38,7 @@ class BaseDetectorResults(ABC):
         self.instance = instance
 
     @abstractmethod
-    def boxse(self):
+    def boxse(self, callback = None):
         pass
 
     def plot(self, img=None):

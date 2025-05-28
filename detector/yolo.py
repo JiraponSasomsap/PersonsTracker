@@ -53,13 +53,15 @@ class GetDetectorYOLO(BaseDetectorResults):
     def __init__(self, instance:DetectorYOLO):
         super().__init__(instance)
 
-    def boxse(self):
+    def boxse(self, callback=None):
         results = self.instance.results
         if results is None:
             warnings.warn("No prediction results found. Please run `predict()` first.", UserWarning)
             return np.empty((0, 4), dtype=np.float32)
 
         boxes = results.boxes
+
+        _boxes = None
         if boxes is not None and boxes.xyxy is not None:
             # Get boxes and scores
             box_tensor = boxes.xyxy.cpu()  # shape: (N, 4)
@@ -73,10 +75,16 @@ class GetDetectorYOLO(BaseDetectorResults):
 
             # Filter and return kept boxes
             filtered_boxes = box_tensor[keep_indices].numpy()
-            return filtered_boxes
-
+            _boxes = filtered_boxes
         else:
-            return np.empty((0, 4), dtype=np.float32)
+            _boxes =  np.empty((0, 4), dtype=np.float32)
+
+        if callback is None:
+            return _boxes
+        elif callable(callback):
+            return callback(_boxes)
+        else:
+            raise TypeError(f"callback must be callable or None, got {type(callback).__name__}")
 
     def imcrops(self):
         results = self.instance.results
