@@ -39,11 +39,15 @@ class CustomTracker(Tracker):
                  initialization_delay = None, 
                  pointwise_hit_counter_max = 4, 
                  detection_threshold = 0, 
-                 filter_factory = OptimizedKalmanFilterFactory(), 
+                 filter_factory:'OptimizedKalmanFilterFactory' = None, 
                  past_detections_length = 4, 
                  reid_distance_function = None, 
                  reid_distance_threshold = 0, 
                  reid_hit_counter_max = None):
+        
+        if filter_factory is None:
+            filter_factory = OptimizedKalmanFilterFactory()
+
         super().__init__(distance_function, 
                          distance_threshold, 
                          hit_counter_max, 
