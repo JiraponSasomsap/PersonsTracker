@@ -1,4 +1,4 @@
-from .utils.utils import version
+from .utils.version import version
 
 from . import detector, tracker, reid, utils
 
