@@ -6,6 +6,42 @@ import numpy as np
 from .results import TrackedObjectResults
 from norfair.filter import OptimizedKalmanFilterFactory
 
+class tmng:
+    '''Tracker Manager'''
+
+    @staticmethod
+    def conv2dataDict(**data):
+        '''
+        Convert column-based keyword arguments (dict of lists) to a list of row-based dicts.
+
+        Example:
+            conv2dataDict(x=[1,2], y=[3,4]) 
+            => [{'x': 1, 'y': 3}, {'x': 2, 'y': 4}]
+
+        Parameters:
+            **data: Keyword arguments where each value is a list of the same length.
+
+        Returns:
+            List[dict]: List of dictionaries representing each row.
+
+        Raises:
+            ValueError: If input lists are not all the same length.
+        '''
+        keys = list(data.keys())
+        vals = list(data.values())
+
+        for i in range(1, len(vals)):
+            if len(vals[0]) != len(vals[i]):
+                raise ValueError("All values must have the same length")
+            
+        data_list = []
+
+        for i in range(len(vals[0])):
+            row = {k : data[k][i] for k in keys}
+            data_list.append(row)
+        
+        return data_list
+
 class CustomTrackedObject(TrackedObject):
     def __init__(self, 
                  obj_factory, 
@@ -63,6 +99,17 @@ class CustomTracker(Tracker):
                          reid_hit_counter_max)
 
     def set_tracker(self, custom_tracked_object = CustomTrackedObject, **kwds):
+        '''
+        Set custom tracked object factory and region configs.
+
+        Parameters:
+            custom_tracked_object: class to use for tracked objects
+            **kwds: additional region configurations (e.g., roi, roni, roi1, roni1)
+
+        Notes:
+            - "roi" = Region Of Interest
+            - "roni" = Region Of No Interest
+        '''
         setattr(self, '_obj_factory', _TrackedObjectAutoFactory(custom_tracked_object))
         self.kwds = kwds
         return self
@@ -76,8 +123,28 @@ class CustomTracker(Tracker):
         embedding=None,
         **update_params
     ):
-        '''points: (N, 2) หรือ (N, 4) ndarray'''
+        '''
+        Convenient wrapper to convert raw detection data into Detection objects 
+        and update the tracker.
+
+        Parameters:
+            points (np.ndarray): An (N, 2) or (N, 4) array of detection points.
+                - (x, y) for keypoints or center points
+                - (x1, y1, x2, y2) for bounding boxes
+            scores (list or array, optional): Confidence scores per detection.
+            data (list, optional): Additional data for each detection.
+            label (list, optional): Class labels per detection.
+            embedding (list, optional): Feature vectors for Re-ID (Re-identification).
+            **update_params: Extra parameters passed to the underlying `update()`.
+
+        Returns:
+            list: List of updated `TrackedObject` instances.
         
+        Raises:
+            TypeError: If `points` is not convertible to a numpy array.
+            ValueError: If shape of `points` is invalid or if any extra param
+                        (scores, data, label, embedding) has mismatched length.
+        '''
         if not isinstance(points, np.ndarray):
             try:
                 points = np.array(points)
