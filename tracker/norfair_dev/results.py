@@ -40,7 +40,7 @@ class TrackedObjectResults:
             return callable(oo)
         return oo
 
-    def active_last_detection_data(self, callback):
+    def active_last_detection_data(self, callback=None):
         oo = [
             o.last_detection.data
             for o in self.insts.tracked_objects
