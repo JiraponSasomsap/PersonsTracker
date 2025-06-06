@@ -48,6 +48,8 @@ class CustomTracker(Tracker):
         if filter_factory is None:
             filter_factory = OptimizedKalmanFilterFactory()
 
+        self.results_getter = TrackedObjectResults(self)
+
         super().__init__(distance_function, 
                          distance_threshold, 
                          hit_counter_max, 
@@ -115,7 +117,7 @@ class CustomTracker(Tracker):
     
     @property
     def get(self):
-        return TrackedObjectResults(self)
+        return self.results_getter
 
 class _TrackedObjectAutoFactory(_TrackedObjectFactory):
     def __init__(self, object_class: type):
