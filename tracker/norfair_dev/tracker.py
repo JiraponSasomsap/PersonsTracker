@@ -4,6 +4,7 @@ from norfair.tracker import (TrackedObject,
                              Detection)
 import numpy as np
 from .results import TrackedObjectResults
+from norfair.filter import OptimizedKalmanFilterFactory
 
 class CustomTrackedObject(TrackedObject):
     def __init__(self, 
@@ -38,7 +39,7 @@ class CustomTracker(Tracker):
                  initialization_delay = None, 
                  pointwise_hit_counter_max = 4, 
                  detection_threshold = 0, 
-                 filter_factory = ..., 
+                 filter_factory = OptimizedKalmanFilterFactory(), 
                  past_detections_length = 4, 
                  reid_distance_function = None, 
                  reid_distance_threshold = 0, 
